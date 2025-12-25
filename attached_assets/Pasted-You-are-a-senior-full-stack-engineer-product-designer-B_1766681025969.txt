@@ -1,0 +1,141 @@
+You are a senior full-stack engineer + product designer. Build a production-ready web app for a voice AI automation company called VoiceEase.
+
+GOAL
+Create a high-converting, futuristic agency website + a lightweight customer portal:
+- Marketing site (public pages) to generate demos/leads
+- Auth (signup/login)
+- Customer dashboard where users fill a business intake form
+- AI recommendation page that suggests Starter ($500) vs Custom ($1000)
+- Submit “Agent Request” which creates a lead for the VoiceEase team to follow up and close
+
+STACK (use exactly this)
+- Next.js (App Router) + TypeScript
+- TailwindCSS
+- shadcn/ui components
+- Prisma ORM + SQLite (local Replit DB)
+- NextAuth (Credentials provider) for email+password auth
+- Zod for validation
+- Server Actions for form submits
+- No paid APIs required
+
+DESIGN SYSTEM
+Futuristic, premium, clean. Use:
+- Primary: Purple (#6D28D9 or similar)
+- Background: White + light grey (#F3F4F6)
+- Text: Dark grey (#111827)
+- Subtle glass/gradient accents, soft shadows, rounded 2xl
+- Smooth micro-animations (CSS transitions only)
+- Mobile-first layout and accessible typography
+
+INFORMATION ARCHITECTURE (PUBLIC)
+Create these pages with polished copy:
+1) /
+2) /how-it-works
+3) /solutions (by industry)
+4) /features
+5) /pricing
+6) /use-cases
+7) /demo (book a call)
+8) /about
+9) /contact
+10) /login
+11) /signup
+
+AUTHENTICATED (PORTAL)
+12) /app (dashboard home)
+13) /app/request-agent (business intake form)
+14) /app/recommendation (AI suggests best plan + sample call flow preview)
+15) /app/requests (list of submitted requests)
+16) /app/settings (profile + logout)
+
+PRICING REQUIREMENTS
+- Starter Agent: $500 one-time setup
+  Includes: 24/7 answering, FAQ, booking, lead capture, calendar integration, SMS/email confirmations, basic analytics/transcripts, industry templates.
+- Custom-Trained Agent: $1000 one-time setup
+  Includes everything + custom scripts/training, custom qualification logic, routing rules, advanced booking logic, optional CRM integration.
+- Put these clearly on /pricing and in recommendation output.
+
+PORTAL FLOW REQUIREMENTS (CRITICAL)
+1) User signs up with email+password.
+2) User logs in -> /app
+3) User clicks “Request Your AI Voice Agent” -> /app/request-agent
+4) Intake form fields:
+   - businessName (required)
+   - industry (dropdown: salons/spas, cafes/restaurants, dentists, doctors/clinics, lawyers, resorts/hotels, realtors, creators/coaches, gyms, local services)
+   - businessPhone (required)
+   - businessHours
+   - servicesOffered (textarea)
+   - appointmentTypes (multi-select or comma input)
+   - calendarUsed (Google, Outlook, None)
+   - typicalQuestions (textarea)
+   - primaryGoal (increase bookings, capture leads, customer support, after-hours coverage, all)
+   - preferredLanguage (English default + optional)
+5) On submit:
+   - Validate with Zod
+   - Save to DB as an AgentRequest with status = "NEW"
+   - Generate an “AI Recommendation” WITHOUT external LLM: implement a deterministic rules engine based on form inputs:
+       - If industry is dentist/doctor/lawyer/resort OR servicesOffered length > 200 OR appointmentTypes includes multiple types OR calendarUsed is not None -> suggest Custom ($1000)
+       - Else suggest Starter ($500)
+     Also generate:
+       - recommendedCallFlows: list of 3-5 bullet flows
+       - sampleOpeningScript: 3-5 lines
+       - expectedImpact: conservative copy like “reduce missed calls and increase booked appointments”
+6) Show recommendation page with:
+   - Plan card (Starter or Custom)
+   - Features included
+   - Preview script + call flow bullets
+   - CTA: “Request This Agent”
+7) “Request This Agent” finalizes the request:
+   - Update DB: planSelected, status = "REQUESTED"
+   - Show success page: “We’ll contact you within 1 business day” (static text)
+   - Add /app/requests list so user can see submitted requests
+
+DATABASE (PRISMA)
+Create Prisma schema with:
+- User: id, email (unique), passwordHash, createdAt
+- AgentRequest: id, userId (FK), businessName, industry, businessPhone, businessHours, servicesOffered, appointmentTypes, calendarUsed, typicalQuestions, primaryGoal, preferredLanguage, recommendationPlan, recommendationData (JSON), planSelected, status (NEW|RECOMMENDED|REQUESTED), createdAt, updatedAt
+
+SECURITY
+- Hash passwords with bcrypt
+- Protect /app routes with NextAuth session checks
+- Server actions must verify session userId
+- Basic rate limit: simple in-memory per IP for signup/login (good enough for demo)
+
+MARKETING SITE COPY (HIGH CONVERSION)
+Use this positioning:
+- Company: VoiceEase
+- Tagline: “Never Miss a Call. Never Miss a Lead.”
+- Problem: missed calls = lost revenue; after-hours lost forever
+- Solution: 24/7 natural voice AI receptionist that books appointments, qualifies leads, answers FAQs, routes calls, sends SMS/email confirmations.
+- Industries: salons, restaurants, dentists, clinics, lawyers, resorts, realtors, creators, gyms, local services.
+Include:
+- Hero headline + subheadline + 2 CTAs (Primary: Book a Free Demo, Secondary: See How It Works)
+- Social proof placeholders
+- Benefit blocks (Revenue recovery, Time saved, Always-on, Consistent experience)
+- How it works steps (4)
+- Feature grid
+- Use-case snippets per industry
+- Pricing section summary with $500/$1000
+- FAQ
+- Strong final CTA section
+
+PAGES DETAILS
+/solutions: show industry cards with pain point + how VoiceEase helps + 2-3 example call tasks.
+/demo: embed a simple “Book a call” form (name, email, business, phone, message) that saves to DB as DemoLead (add model) OR just stores in AgentRequest? Prefer a separate DemoLead model.
+/contact: contact form (name, email, message) saved to DB as ContactMessage.
+
+EXTRA REQUIREMENTS
+- Add top nav with Login/Signup; when logged in show “Dashboard”
+- Add footer with links + privacy/terms placeholders
+- Add a “live demo” style component on homepage: a fake phone call transcript UI with typing animation (no external libs required)
+- Add responsive styling and clean component structure
+
+OUTPUT
+- Provide the full Replit project with instructions in README:
+  - npm install
+  - npx prisma migrate dev
+  - npm run dev
+- Ensure it runs end-to-end in Replit with SQLite.
+- Include seed script to create a demo user and example requests.
+
+Now generate the entire codebase with correct folder structure, components, pages, Prisma schema, and styling. Ensure there are no missing imports and the app compiles.
