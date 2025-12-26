@@ -35,9 +35,10 @@ export default function AuthPage() {
   const onSubmit = (data: LoginInput) => {
     const mutation = activeTab === "login" ? loginMutation : registerMutation;
     mutation.mutate(data, {
-      onSuccess: () => {
+      onSuccess: (user) => {
         toast({ title: `Welcome ${activeTab === "login" ? "back" : ""}!` });
-        setLocation("/app");
+        // Redirect based on user role
+        setLocation(user.role === "admin" ? "/admin" : "/app");
       },
       onError: (err) => {
         toast({ 
@@ -58,7 +59,7 @@ export default function AuthPage() {
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground mx-auto">
              <Mic className="h-6 w-6" />
           </div>
-          <h2 className="text-3xl font-display font-bold">Welcome to VocalAI</h2>
+          <h2 className="text-3xl font-display font-bold">Welcome to VoiceEase</h2>
           <p className="text-muted-foreground">Sign in to manage your voice agents</p>
         </div>
 

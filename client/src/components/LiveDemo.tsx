@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Phone, User, Bot, Mic } from "lucide-react";
 
 const script = [
-  { role: "agent", text: "Hi there! This is Alex from VocalAI. How can I help you today?" },
+  { role: "agent", text: "Hi there! This is Alex from VoiceEase. How can I help you today?" },
   { role: "user", text: "I'm looking to automate my dental clinic's appointment booking." },
   { role: "agent", text: "That's a perfect use case. I can integrate with your calendar, handle rescheduling, and even send reminders. Would you like to see a demo?" },
   { role: "user", text: "Yes, definitely. Does it work with Google Calendar?" },

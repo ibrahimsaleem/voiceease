@@ -77,3 +77,8 @@ export function useLogout() {
     },
   });
 }
+
+export function useIsAdmin() {
+  const { data: user } = useUser();
+  return user?.role === "admin";
+}

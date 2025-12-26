@@ -2,29 +2,33 @@ import { Link, useLocation } from "wouter";
 import { useUser, useLogout } from "@/hooks/use-auth";
 import { 
   LayoutDashboard, 
-  PlusCircle, 
-  Settings, 
+  Users, 
+  FileText, 
+  MessageSquare, 
   LogOut, 
-  Mic,
-  List
+  Shield,
+  Mic
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
-export function AppLayout({ children }: { children: React.ReactNode }) {
-  const [location, setLocation] = useLocation();
+export function AdminLayout({ children }: { children: React.ReactNode }) {
+  const [location] = useLocation();
   const { data: user } = useUser();
   const { mutate: logout } = useLogout();
 
   const sidebarLinks = [
-    { href: "/app", icon: LayoutDashboard, label: "Overview" },
-    { href: "/app/requests", icon: List, label: "My Requests" },
-    { href: "/app/request-agent", icon: PlusCircle, label: "New Agent" },
-    { href: "/app/settings", icon: Settings, label: "Settings" },
+    { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
+    { href: "/admin/users", icon: Users, label: "Users" },
+    { href: "/admin/requests", icon: FileText, label: "Agent Requests" },
+    { href: "/admin/leads", icon: MessageSquare, label: "Leads & Contacts" },
   ];
 
-  // Redirect to login if not authenticated
-  if (!user) {
-    setLocation("/login");
+  if (!user) return null;
+
+  // Redirect non-admin users
+  if (user.role !== "admin") {
+    window.location.href = "/app";
     return null;
   }
 
@@ -42,6 +46,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="p-4 space-y-1 flex-1">
+          <div className="mb-4 px-2">
+            <Badge variant="default" className="bg-primary/10 text-primary border-primary/20">
+              <Shield className="h-3 w-3 mr-1" />
+              Admin Panel
+            </Badge>
+          </div>
+          
           {sidebarLinks.map((link) => {
             const Icon = link.icon;
             const isActive = location === link.href;
@@ -66,6 +77,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
              </div>
              <div className="flex-1 overflow-hidden">
                <p className="text-sm font-medium truncate">{user.username}</p>
+               <p className="text-xs text-muted-foreground">Administrator</p>
              </div>
           </div>
           <Button variant="outline" className="w-full gap-2" onClick={() => logout()}>
@@ -77,10 +89,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main className="flex-1 md:ml-64 p-8">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {children}
         </div>
       </main>
     </div>
   );
 }
+

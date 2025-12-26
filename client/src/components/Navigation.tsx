@@ -15,6 +15,7 @@ export function Navigation() {
     { href: "/features", label: "Features" },
     { href: "/solutions", label: "Solutions" },
     { href: "/pricing", label: "Pricing" },
+    { href: "/how-it-works", label: "How It Works" },
     { href: "/about", label: "About" },
   ];
 
@@ -26,7 +27,7 @@ export function Navigation() {
             <Mic className="h-5 w-5" />
           </div>
           <span className="text-xl font-bold font-display tracking-tight text-foreground">
-            VocalAI
+            VoiceEase
           </span>
         </Link>
 

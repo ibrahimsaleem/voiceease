@@ -129,6 +129,79 @@ export const api = {
         400: errorSchemas.validation,
       }
     }
+  },
+  admin: {
+    getUsers: {
+      method: 'GET' as const,
+      path: '/api/admin/users',
+      responses: {
+        200: z.array(z.custom<typeof users.$inferSelect>()),
+        401: errorSchemas.unauthorized,
+        403: errorSchemas.unauthorized,
+      }
+    },
+    deleteUser: {
+      method: 'DELETE' as const,
+      path: '/api/admin/users/:id',
+      responses: {
+        200: z.object({ message: z.string() }),
+        401: errorSchemas.unauthorized,
+        403: errorSchemas.unauthorized,
+        404: errorSchemas.notFound,
+      }
+    },
+    updateUserRole: {
+      method: 'PATCH' as const,
+      path: '/api/admin/users/:id/role',
+      input: z.object({ role: z.enum(['admin', 'user']) }),
+      responses: {
+        200: z.custom<typeof users.$inferSelect>(),
+        401: errorSchemas.unauthorized,
+        403: errorSchemas.unauthorized,
+        404: errorSchemas.notFound,
+      }
+    },
+    getAllRequests: {
+      method: 'GET' as const,
+      path: '/api/admin/agent-requests',
+      responses: {
+        200: z.array(z.custom<typeof agentRequests.$inferSelect>()),
+        401: errorSchemas.unauthorized,
+        403: errorSchemas.unauthorized,
+      }
+    },
+    getAllLeads: {
+      method: 'GET' as const,
+      path: '/api/admin/leads',
+      responses: {
+        200: z.array(z.custom<typeof demoLeads.$inferSelect>()),
+        401: errorSchemas.unauthorized,
+        403: errorSchemas.unauthorized,
+      }
+    },
+    getAllContacts: {
+      method: 'GET' as const,
+      path: '/api/admin/contacts',
+      responses: {
+        200: z.array(z.custom<typeof contactMessages.$inferSelect>()),
+        401: errorSchemas.unauthorized,
+        403: errorSchemas.unauthorized,
+      }
+    },
+    getStats: {
+      method: 'GET' as const,
+      path: '/api/admin/stats',
+      responses: {
+        200: z.object({
+          userCount: z.number(),
+          requestCount: z.number(),
+          leadCount: z.number(),
+          contactCount: z.number(),
+        }),
+        401: errorSchemas.unauthorized,
+        403: errorSchemas.unauthorized,
+      }
+    }
   }
 };
 

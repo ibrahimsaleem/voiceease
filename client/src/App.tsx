@@ -9,22 +9,26 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import AuthPage from "@/pages/Auth";
 import DemoPage from "@/pages/Demo";
+import Features from "@/pages/Features";
+import Solutions from "@/pages/Solutions";
+import Pricing from "@/pages/Pricing";
+import HowItWorks from "@/pages/HowItWorks";
+import UseCases from "@/pages/UseCases";
+import About from "@/pages/About";
+import Contact from "@/pages/Contact";
 
 // Dashboard Pages
 import DashboardHome from "@/pages/dashboard/DashboardHome";
 import RequestAgent from "@/pages/dashboard/RequestAgent";
 import Recommendation from "@/pages/dashboard/Recommendation";
+import Requests from "@/pages/dashboard/Requests";
+import Settings from "@/pages/dashboard/Settings";
 
-// Placeholder pages for Nav links to prevent 404s during demo
-function Placeholder({ title }: { title: string }) {
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center">
-      <h1 className="text-4xl font-bold mb-4">{title}</h1>
-      <p className="text-muted-foreground">This page is under construction for the demo.</p>
-      <a href="/" className="mt-8 text-primary hover:underline">Go Home</a>
-    </div>
-  );
-}
+// Admin Pages
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import UsersManagement from "@/pages/admin/UsersManagement";
+import AdminRequests from "@/pages/admin/AdminRequests";
+import LeadsManagement from "@/pages/admin/LeadsManagement";
 
 function Router() {
   return (
@@ -33,20 +37,26 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/login" component={AuthPage} />
       <Route path="/demo" component={DemoPage} />
-      
-      {/* Marketing Placeholders */}
-      <Route path="/features" component={() => <Placeholder title="Features" />} />
-      <Route path="/solutions" component={() => <Placeholder title="Solutions" />} />
-      <Route path="/pricing" component={() => <Placeholder title="Pricing" />} />
-      <Route path="/about" component={() => <Placeholder title="About Us" />} />
-      <Route path="/contact" component={() => <Placeholder title="Contact" />} />
+      <Route path="/features" component={Features} />
+      <Route path="/solutions" component={Solutions} />
+      <Route path="/pricing" component={Pricing} />
+      <Route path="/how-it-works" component={HowItWorks} />
+      <Route path="/use-cases" component={UseCases} />
+      <Route path="/about" component={About} />
+      <Route path="/contact" component={Contact} />
 
       {/* Authenticated Dashboard Routes */}
       <Route path="/app" component={DashboardHome} />
-      <Route path="/app/requests" component={DashboardHome} /> {/* Reusing home for list view for now */}
+      <Route path="/app/requests" component={Requests} />
       <Route path="/app/request-agent" component={RequestAgent} />
       <Route path="/app/recommendation" component={Recommendation} />
-      <Route path="/app/settings" component={() => <Placeholder title="Settings" />} />
+      <Route path="/app/settings" component={Settings} />
+
+      {/* Admin Routes */}
+      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/users" component={UsersManagement} />
+      <Route path="/admin/requests" component={AdminRequests} />
+      <Route path="/admin/leads" component={LeadsManagement} />
 
       {/* Fallback */}
       <Route component={NotFound} />

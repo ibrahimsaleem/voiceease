@@ -24,6 +24,15 @@ export interface IStorage {
   // Demo & Contact
   createDemoLead(lead: InsertDemoLead): Promise<DemoLead>;
   createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
+
+  // Admin Methods
+  getAllUsers(): Promise<User[]>;
+  deleteUser(id: number): Promise<void>;
+  updateUserRole(id: number, role: string): Promise<User>;
+  getAllAgentRequests(): Promise<AgentRequest[]>;
+  getAllDemoLeads(): Promise<DemoLead[]>;
+  getAllContactMessages(): Promise<ContactMessage[]>;
+  getSystemStats(): Promise<{ userCount: number; requestCount: number; leadCount: number; contactCount: number }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -75,6 +84,54 @@ export class DatabaseStorage implements IStorage {
   async createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
     const [created] = await db.insert(contactMessages).values(message).returning();
     return created;
+  }
+
+  // Admin Methods
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
+  }
+
+  async updateUserRole(id: number, role: string): Promise<User> {
+    const [updated] = await db.update(users)
+      .set({ role })
+      .where(eq(users.id, id))
+      .returning();
+    return updated;
+  }
+
+  async getAllAgentRequests(): Promise<AgentRequest[]> {
+    return await db.select().from(agentRequests);
+  }
+
+  async getAllDemoLeads(): Promise<DemoLead[]> {
+    return await db.select().from(demoLeads);
+  }
+
+  async getAllContactMessages(): Promise<ContactMessage[]> {
+    return await db.select().from(contactMessages);
+  }
+
+  async getSystemStats(): Promise<{ userCount: number; requestCount: number; leadCount: number; contactCount: number }> {
+    const [userCountResult] = await db.select().from(users);
+    const [requestCountResult] = await db.select().from(agentRequests);
+    const [leadCountResult] = await db.select().from(demoLeads);
+    const [contactCountResult] = await db.select().from(contactMessages);
+
+    const allUsers = await db.select().from(users);
+    const allRequests = await db.select().from(agentRequests);
+    const allLeads = await db.select().from(demoLeads);
+    const allContacts = await db.select().from(contactMessages);
+
+    return {
+      userCount: allUsers.length,
+      requestCount: allRequests.length,
+      leadCount: allLeads.length,
+      contactCount: allContacts.length,
+    };
   }
 }
 

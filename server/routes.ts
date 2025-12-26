@@ -12,6 +12,17 @@ import createMemoryStore from "memorystore";
 
 const MemoryStore = createMemoryStore(session);
 
+// --- ADMIN MIDDLEWARE ---
+function requireAdmin(req: any, res: any, next: any) {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Forbidden - Admin access required" });
+  }
+  next();
+}
+
 // --- HELPER FOR "AI" LOGIC ---
 function generateRecommendation(data: any) {
   // Deterministic Rules Engine
@@ -217,11 +228,105 @@ export async function registerRoutes(
     }
   });
 
+  // Admin Routes
+  app.get(api.admin.getUsers.path, requireAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (err) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  });
+
+  app.delete(api.admin.deleteUser.path, requireAdmin, async (req, res) => {
+    try {
+      const userId = Number(req.params.id);
+      const user = await storage.getUser(userId);
+      if (!user) return res.status(404).json({ message: "User not found" });
+      
+      // Prevent self-deletion
+      if ((req.user as any).id === userId) {
+        return res.status(400).json({ message: "Cannot delete your own account" });
+      }
+      
+      await storage.deleteUser(userId);
+      res.json({ message: "User deleted successfully" });
+    } catch (err) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  });
+
+  app.patch(api.admin.updateUserRole.path, requireAdmin, async (req, res) => {
+    try {
+      const userId = Number(req.params.id);
+      const { role } = req.body;
+      
+      if (!role || !['admin', 'user'].includes(role)) {
+        return res.status(400).json({ message: "Invalid role" });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) return res.status(404).json({ message: "User not found" });
+      
+      const updated = await storage.updateUserRole(userId, role);
+      res.json(updated);
+    } catch (err) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  });
+
+  app.get(api.admin.getAllRequests.path, requireAdmin, async (req, res) => {
+    try {
+      const requests = await storage.getAllAgentRequests();
+      res.json(requests);
+    } catch (err) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  });
+
+  app.get(api.admin.getAllLeads.path, requireAdmin, async (req, res) => {
+    try {
+      const leads = await storage.getAllDemoLeads();
+      res.json(leads);
+    } catch (err) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  });
+
+  app.get(api.admin.getAllContacts.path, requireAdmin, async (req, res) => {
+    try {
+      const contacts = await storage.getAllContactMessages();
+      res.json(contacts);
+    } catch (err) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  });
+
+  app.get(api.admin.getStats.path, requireAdmin, async (req, res) => {
+    try {
+      const stats = await storage.getSystemStats();
+      res.json(stats);
+    } catch (err) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  });
+
   // SEED DATA
+  // Create admin user
+  if (await storage.getUserByUsername("admin@voiceease.com") === undefined) {
+    await storage.createUser({
+      username: "admin@voiceease.com",
+      password: "admin123",
+      role: "admin"
+    });
+  }
+
+  // Create demo user
   if (await storage.getUserByUsername("demo@voiceease.com") === undefined) {
     await storage.createUser({
       username: "demo@voiceease.com",
-      password: "password123"
+      password: "password123",
+      role: "user"
     });
     
     // Create a sample request
